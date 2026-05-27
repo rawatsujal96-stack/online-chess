@@ -1,5 +1,17 @@
+const sounds = {
+  move: new Audio(process.env.PUBLIC_URL + "/sound/move.mp3"),
+
+  capture: new Audio(process.env.PUBLIC_URL + "/sound/capture.mp3"),
+
+  checkmate: new Audio(process.env.PUBLIC_URL + "/sound/checkmate.mp3"),
+};
+
 export const playSound = (type = "move") => {
-  const audio = new Audio(`/online-chess/sound/${type}.mp3`);
-  audio.volume = 1;
-  audio.play().catch((err) => console.log("sound error:", err));
+  const sound = sounds[type];
+
+  if (sound) {
+    sound.currentTime = 0;
+
+    sound.play().catch(() => {});
+  }
 };
