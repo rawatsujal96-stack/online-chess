@@ -143,10 +143,13 @@ return (
 
 <br />
 
-<span style={{ color: "white" }}>
-  White Timer: {Math.floor(whiteTime / 60)}:
-  {(whiteTime % 60).toString().padStart(2, "0")}
-</span>
+<div className="timer-card white-timer">
+  <div className="timer-title">♔ White</div>
+  <div className="timer-time">
+    {Math.floor(whiteTime / 60)}:
+    {(whiteTime % 60).toString().padStart(2, "0")}
+  </div>
+</div>
 
 <br />
 <br />
@@ -160,11 +163,13 @@ return (
 </span>
 
 <br />
-
-<span style={{ color: "white" }}>
-  Black Timer: {Math.floor(blackTime / 60)}:
-  {(blackTime % 60).toString().padStart(2, "0")}
-</span>
+<div className="timer-card black-timer">
+  <div className="timer-title">♚ Black</div>
+  <div className="timer-time">
+    {Math.floor(blackTime / 60)}:
+    {(blackTime % 60).toString().padStart(2, "0")}
+  </div>
+</div>
 					</div>
 				</div>
 				<br />
