@@ -26,13 +26,7 @@ function ChessBoard() {
 const [whiteTime, setWhiteTime] = useState(selectedTimer)
 const [blackTime, setBlackTime] = useState(selectedTimer)
 const isWhitePlayer = orientation === "white";
-	const boardsContainer = {
-		display: "flex",
-		justifyContent: "space-around",
-		alignItems: "center",
-		flexWrap: "wrap",
-		width: "100vw"
-	}
+	
 
 	useEffect(() => {
 
