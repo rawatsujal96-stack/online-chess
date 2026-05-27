@@ -57,6 +57,9 @@ if (game.blackTime !== undefined) {
 		socket.on("resigned", () => {
 			setOpponentResigned(true)
 		})
+		socket.on("connect_error", () => {
+  alert("Connection lost. Please refresh or try again.");
+});
 
 	}, [locState.game.id, locState.username]);
 	useEffect(() => {
@@ -107,6 +110,9 @@ useEffect(() => {
 
 		return rows;
 	}
+	if (!game || !game.id) {
+  return <div style={{ color: "white", padding: "40px" }}>Loading Game...</div>;
+}
 
 return (
   <div className="classic-game-page">

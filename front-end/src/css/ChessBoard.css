@@ -61,3 +61,23 @@ span {
   color: white !important;
   border: 1px solid #b8862d !important;
 }
+@media only screen and (max-width: 900px) {
+
+  .classic-game-page {
+    grid-template-columns: 1fr;
+
+    padding: 90px 15px 20px;
+  }
+
+  .classic-board-panel {
+    overflow-x: auto;
+  }
+
+  .classic-side-panel {
+    width: 100%;
+  }
+
+  .moves-div {
+    max-height: 220px;
+  }
+}
