@@ -1,0 +1,166 @@
+.App {
+  text-align: center;
+}
+
+body{
+  background-color: rgb(27, 28, 29);
+}
+
+.main {
+  text-align: center;
+  padding-top: 10px;
+  height: 100%;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resign:hover{
+  transition: 500ms;
+  color: white!important;
+    background-color: orangered!important;}
+  body {
+  margin: 0;
+  padding: 0;
+
+ background:
+  linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.25)),
+  url("./home-bg.jpg");
+
+  background-size: cover;
+
+  background-position: center;
+
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.home-container {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-card {
+  width: 720px;
+
+  padding: 60px;
+
+  text-align: center;
+
+  background: rgba(12,12,12,0.82);
+
+  border: 2px solid #c89b3c;
+
+  border-radius: 24px;
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 0 30px rgba(200,155,60,0.25),
+    0 0 120px rgba(0,0,0,0.8);
+}
+
+.logo-icon {
+  font-size: 90px;
+  color: #f0d084;
+
+  margin-bottom: 20px;
+}
+
+.main-title {
+  font-size: 72px;
+
+  color: #f0d084;
+
+  letter-spacing: 5px;
+
+  margin: 0;
+}
+
+.subtitle {
+  margin-top: 25px;
+
+  color: #e9d7ae;
+
+  font-size: 24px;
+}
+
+.button-group {
+  margin-top: 50px;
+
+  display: flex;
+  justify-content: center;
+
+  gap: 30px;
+}
+
+.main-title{
+  color: #f0d084 !important;
+}
+
+.subtitle{
+  color: #f5e6c8 !important;
+}
+
+.logo-icon{
+  color: #f0d084 !important;
+}
+
+.ui.button{
+  background: linear-gradient(180deg, #d8b15d, #9b6a1c) !important;
+
+  color: black !important;
+
+  border-radius: 10px !important;
+
+  font-size: 18px !important;
+
+  font-weight: bold !important;
+
+  padding: 15px 30px !important;
+
+  border: none !important;
+
+  transition: 0.3s ease !important;
+}
+
+.ui.button:hover{
+  transform: scale(1.05);
+
+  box-shadow: 0 0 20px rgba(212,169,74,0.5) !important;
+}
