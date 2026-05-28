@@ -77,9 +77,18 @@ useEffect(() => {
   const interval = setInterval(() => {
     const currentGame = gameRef.current;
 
+    if (
+      !currentGame ||
+      currentGame.status !== "ongoing" ||
+      !currentGame.players ||
+      currentGame.players.length < 2
+    ) {
+      return;
+    }
+
     const moves = currentGame.pgn
       .trim()
-      .split(" ")
+      .split(/\s+/)
       .filter(item => item && !item.includes("."));
 
     const moveCount = moves.length;
