@@ -24,9 +24,8 @@ function ChessBoard() {
 	const selectedTimer = locState.game.timer || locState.game.whiteTime || 0;
 
 
-	const [whiteTime, setWhiteTime] = useState(selectedTimer * 60)
-const [blackTime, setBlackTime] = useState(selectedTimer * 60)
-
+	const [whiteTime, setWhiteTime] = useState(selectedTimer)
+const [blackTime, setBlackTime] = useState(selectedTimer)
 	useEffect(() => {
 
 		socket.emit("fetch", { id: locState.game.id })
@@ -34,7 +33,7 @@ const [blackTime, setBlackTime] = useState(selectedTimer * 60)
 			console.log("RICEVUTO FETCH")
 			
 			setGame(game)
-			const fallbackTime = (selectedTimer || 5) * 60;
+			const fallbackTime = selectedTimer || 300;
 
 setWhiteTime(
   game.whiteTime !== undefined

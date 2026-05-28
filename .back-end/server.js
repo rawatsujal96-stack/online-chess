@@ -13,6 +13,39 @@ app.use(express.json());
 // const conn = mongoose.connection;
 
 let games = []
+const getMoveCount = (pgn = "") => {
+  return pgn.trim().split(/\s+/).filter(item => item && !item.includes(".")).length;
+};
+
+const getActiveColor = (game) => {
+  return getMoveCount(game.pgn) % 2 === 0 ? "white" : "black";
+};
+
+const syncGameClock = (game) => {
+  if (!game || !game.timer || game.timer <= 0) return;
+  if (game.status !== "ongoing") return;
+  if (!game.players || game.players.length < 2) return;
+
+  const now = Date.now();
+
+  if (!game.lastTickAt) {
+    game.lastTickAt = now;
+    return;
+  }
+
+  const elapsedSeconds = Math.floor((now - game.lastTickAt) / 1000);
+  if (elapsedSeconds <= 0) return;
+
+  const activeColor = getActiveColor(game);
+
+  if (activeColor === "white") {
+    game.whiteTime = Math.max(0, game.whiteTime - elapsedSeconds);
+  } else {
+    game.blackTime = Math.max(0, game.blackTime - elapsedSeconds);
+  }
+
+  game.lastTickAt += elapsedSeconds * 1000;
+};
 
 app.get('/', function (req, res) {
 	res.send('Server is running correctly')
@@ -30,14 +63,17 @@ io.on("connection", (socket) => {
 
 	socket.on("create", ({ username, timer }) => {
 		let id = Math.random().toString(36).slice(9);
-	games.push({
-	id: id,
-	players: [username],
-	pgn: "",
-	status: 'starting',
-	timer: timer || 0,
-	whiteTime: timer || 0,
-	blackTime: timer || 0
+	const initialTime = Number(timer) || 0;
+
+games.push({
+  id: id,
+  players: [username],
+  pgn: "",
+  status: "starting",
+  timer: initialTime,
+  whiteTime: initialTime,
+  blackTime: initialTime,
+  lastTickAt: null
 })
 		socket.join(id)
 		socket.emit("created", { game: games[games.length - 1] })
@@ -48,6 +84,7 @@ io.on("connection", (socket) => {
 	socket.on("fetch", ({ id }) => {
 		games.forEach(game => {
 			if (game.id === id) {
+				syncGameClock(game);
 				if (![...socket.rooms].indexOf(id) >= 0)
 					socket.join(id)
 				socket.to(id).emit("fetch", { game: game })
@@ -69,8 +106,10 @@ io.on("connection", (socket) => {
 				else {
 					game.players.push(username);
 					game.status = 'ongoing';
+					game.lastTickAt = Date.now();
 					socket.join(id);
 					socket.emit("joined", { game: game });
+					socket.to(id).emit("fetch", { game: game });
 					gamefound = true;
 				}
 			}
@@ -88,17 +127,20 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("move", ({ id, from, to, pgn }) => {
-		games.forEach(game => {
-			if (game.id === id) {
-				game.pgn = pgn
-				socket.to(id).emit("moved", { from: from, to: to })
-				socket.to(id).emit("fetch", {game: game})
-				socket.emit("fetch", {game: game})
-			}
-		})
+  games.forEach(game => {
+    if (game.id === id) {
+      syncGameClock(game);
+      game.pgn = pgn;
+      game.lastTickAt = Date.now();
 
-		logServerStatus();
-	})
+      socket.to(id).emit("moved", { from: from, to: to });
+      socket.to(id).emit("fetch", { game: game });
+      socket.emit("fetch", { game: game });
+    }
+  })
+
+  logServerStatus();
+})
 
 	socket.on("resign", ({ id }) => {
 		socket.to(id).emit("resigned")
