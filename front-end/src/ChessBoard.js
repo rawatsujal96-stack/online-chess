@@ -25,7 +25,7 @@ function ChessBoard() {
 
 const [whiteTime, setWhiteTime] = useState(selectedTimer)
 const [blackTime, setBlackTime] = useState(selectedTimer)
-const isWhitePlayer = orientation === "white";
+
 	
 
 	useEffect(() => {
@@ -35,13 +35,9 @@ const isWhitePlayer = orientation === "white";
 			console.log("RICEVUTO FETCH")
 			
 			setGame(game)
-			if (game.whiteTime !== undefined) {
-  setWhiteTime(game.whiteTime);
-}
+			setWhiteTime(game.whiteTime || selectedTimer * 60);
+setBlackTime(game.blackTime || selectedTimer * 60);
 
-if (game.blackTime !== undefined) {
-  setBlackTime(game.blackTime);
-}
 		
 			setDisconnected(false)
 			if (locState.username === game.players[0]) {
@@ -65,10 +61,8 @@ if (game.blackTime !== undefined) {
 	useEffect(() => {
   gameRef.current = game;
 }, [game]);
-
 useEffect(() => {
   if (!selectedTimer || selectedTimer === 0) return;
-  if (!isWhitePlayer) return;
 
   const interval = setInterval(() => {
     const currentGame = gameRef.current;
@@ -88,7 +82,7 @@ useEffect(() => {
   }, 1000);
 
   return () => clearInterval(interval);
-}, [selectedTimer, isWhitePlayer]);
+}, [selectedTimer]);
 
 
 
