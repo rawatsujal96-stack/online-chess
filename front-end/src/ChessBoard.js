@@ -67,7 +67,8 @@ setBlackTime(
   alert("Connection lost. Please refresh or try again.");
 });
 
-	}, [locState.game.id, locState.username]);
+	}, 
+	 [locState.game.id, locState.username, selectedTimer]);
 	useEffect(() => {
   gameRef.current = game;
 }, [game]);
