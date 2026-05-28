@@ -23,10 +23,9 @@ function ChessBoard() {
 
 	const selectedTimer = locState.game.timer || locState.game.whiteTime || 0;
 
-const [whiteTime, setWhiteTime] = useState(selectedTimer)
-const [blackTime, setBlackTime] = useState(selectedTimer)
 
-	
+	const [whiteTime, setWhiteTime] = useState(selectedTimer * 60)
+const [blackTime, setBlackTime] = useState(selectedTimer * 60)
 
 	useEffect(() => {
 
@@ -35,8 +34,19 @@ const [blackTime, setBlackTime] = useState(selectedTimer)
 			console.log("RICEVUTO FETCH")
 			
 			setGame(game)
-			setWhiteTime(game.whiteTime || selectedTimer * 60);
-setBlackTime(game.blackTime || selectedTimer * 60);
+			const fallbackTime = (selectedTimer || 5) * 60;
+
+setWhiteTime(
+  game.whiteTime !== undefined
+    ? game.whiteTime
+    : fallbackTime
+);
+
+setBlackTime(
+  game.blackTime !== undefined
+    ? game.blackTime
+    : fallbackTime
+);
 
 		
 			setDisconnected(false)
