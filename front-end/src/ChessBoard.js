@@ -8,11 +8,13 @@ import WinLostPopup from './WinLostPopup';
 import Parser from 'html-react-parser';
 
 import './css/ChessBoard.css'
+import aiSocket from './AiSocketConfig';
 
 function ChessBoard() {
 	const location = useLocation()
 const history = useHistory()	
 	const locState = location.state
+  const activeSocket = locState.game.type === "computer" ? aiSocket : socket;
 	const [game, setGame] = useState(locState.game)
 	const gameRef = useRef(game)
 	const [orientation, setOrientation] = useState()
@@ -32,8 +34,8 @@ const timeoutHandledRef = useRef(false);
 const [blackTime, setBlackTime] = useState(selectedTimer)
 	useEffect(() => {
 
-		socket.emit("fetch", { id: locState.game.id })
-		socket.on("fetch", ({ game }) => {
+	activeSocket.emit("fetch", { id: locState.game.id })
+activeSocket.on("fetch", ({ game }) => {
 	
 			console.log("RICEVUTO FETCH")
 			
@@ -61,13 +63,13 @@ setBlackTime(
 				setOrientation("black")
 			}
 		});
-		socket.on("disconnected", () => {
+		activeSocket.on("disconnected", () => {
 			setDisconnected(true)
 		})
-		socket.on("resigned", () => {
+		activeSocket.on("resigned", () => {
 			setOpponentResigned(true)
 		})
-		socket.on("connect_error", () => {
+		activeSocket.on("connect_error", () => {
   alert("Connection lost. Please refresh or try again.");
 });
 
@@ -86,10 +88,10 @@ useEffect(() => {
     alert(`${winner.toUpperCase()} wins on time! ${loser.toUpperCase()} lost.`);
   };
 
-  socket.on("timeout", handleTimeout);
+activeSocket.on("timeout", handleTimeout);
 
   return () => {
-    socket.off("timeout", handleTimeout);
+    activeSocket.off("timeout", handleTimeout);
   };
 }, []);
 useEffect(() => {
@@ -146,7 +148,7 @@ if (moveCount % 2 === 0) {
 
 
 	const handleResignClick = () => {
-		socket.emit("resign", { id: game.id })
+		activeSocket.emit("resign", { id: game.id })
 		setResigned(true)
 	}
 
@@ -178,13 +180,14 @@ return (
   )}
 
       {!timeoutResult && (
-  <WithMoveValidation
-    id={game.id}
-    pgn={game.pgn}
-    orientation={orientation}
-    pieces={pieces}
-    board={board}
-  />
+ <WithMoveValidation
+  id={game.id}
+  pgn={game.pgn}
+  orientation={orientation}
+  pieces={pieces}
+  board={board}
+  socket={activeSocket}
+/>
 )}
     </div>
 
@@ -302,7 +305,7 @@ return (
     animated='vertical'
     className='resign'
     style={{ marginLeft: "20px" }}
-    onClick={() => socket.emit("fetch", { id: locState.game.id })}
+    onClick={() => activeSocket.emit("fetch", { id: locState.game.id })}
   >
     <Button.Content hidden>Fetch</Button.Content>
 

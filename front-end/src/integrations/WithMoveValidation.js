@@ -1,7 +1,7 @@
 import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types';
 import Chess from 'chess.js';
-import socket from '../SocketConfig';
+
 import WinLostPopup from '../WinLostPopup';
 import Chessboard from 'chessboardjsx';
 import { playSound } from "../utils/sound";
@@ -41,7 +41,7 @@ class HumanVsHuman extends Component {
     this.setState({game:chess})
 
     console.log(this.state.game.pgn())
-    socket.on("moved", ({ from, to }) => {
+    this.props.socket.on("moved", ({ from, to }) => {
 
       this.state.game.move({
         from: from,
@@ -62,7 +62,7 @@ class HumanVsHuman extends Component {
       }));
 
       if (this.state.game.in_checkmate()) {
-        socket.emit("checkmate", { id: this.state.id })
+        this.props.socket.emit("checkmate", { id: this.state.id })
         this.setState({ lost: true })
         this.state.game.clear()
       }
@@ -71,18 +71,18 @@ class HumanVsHuman extends Component {
           this.state.game.in_stalemate() || 
           this.state.game.in_threefold_repetition() || 
           this.state.game.insufficient_material()) {
-          socket.emit("draw", { id: this.state.id })
+          this.props.socket.emit("draw", { id: this.state.id })
           this.setState({ draw: true })
           this.state.game.clear()
       }
     })
 
-    socket.on("checkmate", () => {
+    this.props.socket.on("checkmate", () => {
       this.setState({ win: true })
       this.state.game.clear()
     })
 
-    socket.on("draw", () => {
+    this.props.socket.on("draw", () => {
       this.setState({ draw: true })
       this.state.game.clear()
     })
@@ -173,7 +173,7 @@ this.justPlayedSound = true;
       squareStyles: squareStyling({ pieceSquare, history: this.state.game.history({ verbose: true }) })
     }));
 
-    socket.emit("move", { id: this.state.id, from: sourceSquare, to: targetSquare, pgn: this.state.game.pgn() })
+    this.props.socket.emit("move", { id: this.state.id, from: sourceSquare, to: targetSquare, pgn: this.state.game.pgn() })
 
   };
 
@@ -252,7 +252,7 @@ if (this.state.game.in_checkmate()) {
 }
 this.justPlayedSound = true;
 
-    socket.emit("move", { id: this.state.id, from: this.state.pieceSquare, to: square, pgn: this.state.game.pgn() })
+    this.props.socket.emit("move", { id: this.state.id, from: this.state.pieceSquare, to: square, pgn: this.state.game.pgn() })
 
     this.setState({
       fen: this.state.game.fen(),
@@ -302,7 +302,9 @@ this.justPlayedSound = true;
 export default function WithMoveValidation(props) {
 
   return (
-    <HumanVsHuman orientation={props.orientation} id={props.id} pieces={props.pieces} pgn={props.pgn}>
+    <HumanVsHuman
+  orientation={props.orientation}
+  socket={props.socket} id={props.id} pieces={props.pieces} pgn={props.pgn}>
       {({
         position,
         orientation,
