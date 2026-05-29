@@ -174,22 +174,22 @@ async def move(sid, data):
 
             game['pgn'] = data['pgn']
 
-            if game['type'] == 'multiplayer':
+        
 
-                await sio.emit(
+            await sio.emit(
                     'moved',
                     {
                         'from': data['from'],
                         'to': data['to']
                     },
                     room=data['id'],
-                    skip_sid=sid
+                    skip_sid=sid if game['type'] == 'multiplayer' else None
 
                 )
                 
                 
 
-                await sio.emit('fetch', {'game': game}, room=data['id'])
+            await sio.emit('fetch', {'game': game}, room=data['id'])
                     #log()
                  
     #log()
@@ -258,12 +258,14 @@ async def disconnect(sid):
 
 @sio.event
 async def createComputerGame(sid, data):
+    
 
     game_id = ''.join(random.choice(
         '0123456789abcdefghijklmnopqrstuvwxyz') for i in range(4))
 
     players = [data['username'], data['ai']]
     print("TIMER RECEIVED:", data.get('timer', 0))
+    
 
     games.append({
     'id': game_id,
@@ -283,6 +285,7 @@ async def createComputerGame(sid, data):
     sio.enter_room(sid, game_id)
     rooms.append({'id': game_id, 'sids': [sid], 'last_seen': time.time()})
     await sio.emit('createdComputerGame', {'game': games[len(games)-1]})
+    
 
     #log()
 
