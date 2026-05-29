@@ -74,7 +74,7 @@ setBlackTime(
 });
 
 	}, 
-	 [locState.game.id, locState.username, selectedTimer]);
+	  [activeSocket, locState.game.id, locState.username, selectedTimer]);
 	useEffect(() => {
   gameRef.current = game;
 }, [game]);
@@ -93,7 +93,7 @@ activeSocket.on("timeout", handleTimeout);
   return () => {
     activeSocket.off("timeout", handleTimeout);
   };
-}, []);
+}, [activeSocket]);
 useEffect(() => {
   if (!selectedTimer || selectedTimer === 0) return;
 
