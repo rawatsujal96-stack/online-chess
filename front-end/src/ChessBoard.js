@@ -19,6 +19,8 @@ function ChessBoard() {
 	const [opponentResigned, setOpponentResigned] = useState(false)
 	const [pieces, setPieces] = useState("neo")
 	const [board, setBoard] = useState("green.svg")
+	const [timeoutResult, setTimeoutResult] = useState(null);
+const timeoutHandledRef = useRef(false);
 	
 
 	const selectedTimer = locState.game.timer || locState.game.whiteTime || 0;
@@ -30,9 +32,7 @@ const [blackTime, setBlackTime] = useState(selectedTimer)
 
 		socket.emit("fetch", { id: locState.game.id })
 		socket.on("fetch", ({ game }) => {
-			socket.on("timeout", ({ winner, loser }) => {
-  alert(`${winner.toUpperCase()} wins on time! ${loser.toUpperCase()} lost.`);
-});
+	
 			console.log("RICEVUTO FETCH")
 			
 			setGame(game)
@@ -75,6 +75,22 @@ setBlackTime(
   gameRef.current = game;
 }, [game]);
 useEffect(() => {
+  const handleTimeout = ({ winner, loser }) => {
+    if (timeoutHandledRef.current) return;
+
+    timeoutHandledRef.current = true;
+    setTimeoutResult({ winner, loser });
+
+    alert(`${winner.toUpperCase()} wins on time! ${loser.toUpperCase()} lost.`);
+  };
+
+  socket.on("timeout", handleTimeout);
+
+  return () => {
+    socket.off("timeout", handleTimeout);
+  };
+}, []);
+useEffect(() => {
   if (!selectedTimer || selectedTimer === 0) return;
 
   const interval = setInterval(() => {
@@ -95,12 +111,31 @@ useEffect(() => {
       .filter(item => item && !item.includes("."));
 
     const moveCount = moves.length;
+if (moveCount % 2 === 0) {
+  setWhiteTime(prev => {
+    const next = prev > 0 ? prev - 1 : 0;
 
-    if (moveCount % 2 === 0) {
-      setWhiteTime(prev => prev > 0 ? prev - 1 : 0);
-    } else {
-      setBlackTime(prev => prev > 0 ? prev - 1 : 0);
+    if (next === 0 && !timeoutHandledRef.current) {
+      timeoutHandledRef.current = true;
+      setTimeoutResult({ winner: "black", loser: "white" });
+      alert("BLACK wins on time! WHITE lost.");
     }
+
+    return next;
+  });
+} else {
+  setBlackTime(prev => {
+    const next = prev > 0 ? prev - 1 : 0;
+
+    if (next === 0 && !timeoutHandledRef.current) {
+      timeoutHandledRef.current = true;
+      setTimeoutResult({ winner: "white", loser: "black" });
+      alert("WHITE wins on time! BLACK lost.");
+    }
+
+    return next;
+  });
+}
   }, 1000);
 
   return () => clearInterval(interval);
@@ -134,13 +169,21 @@ return (
   <div className="classic-game-page">
 
     <div className="classic-board-panel chessboard">
-      <WithMoveValidation
-        id={game.id}
-        pgn={game.pgn}
-        orientation={orientation}
-        pieces={pieces}
-        board={board}
-      />
+		 {timeoutResult && (
+    <h2 style={{ color: "gold", textAlign: "center" }}>
+      {timeoutResult.winner.toUpperCase()} wins on time!
+    </h2>
+  )}
+
+      {!timeoutResult && (
+  <WithMoveValidation
+    id={game.id}
+    pgn={game.pgn}
+    orientation={orientation}
+    pieces={pieces}
+    board={board}
+  />
+)}
     </div>
 
     <div className="classic-side-panel">
