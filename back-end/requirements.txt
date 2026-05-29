@@ -52,7 +52,7 @@ python-dateutil
 python-engineio
 python-socketio
 pytz
-pyzmq==20.0.0
+pyzmq==25.1.2
 scikit-learn
 scipy
 six 
