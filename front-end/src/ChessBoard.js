@@ -30,6 +30,9 @@ const [blackTime, setBlackTime] = useState(selectedTimer)
 
 		socket.emit("fetch", { id: locState.game.id })
 		socket.on("fetch", ({ game }) => {
+			socket.on("timeout", ({ winner, loser }) => {
+  alert(`${winner.toUpperCase()} wins on time! ${loser.toUpperCase()} lost.`);
+});
 			console.log("RICEVUTO FETCH")
 			
 			setGame(game)

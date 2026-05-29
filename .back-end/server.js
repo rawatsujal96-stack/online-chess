@@ -37,12 +37,23 @@ const syncGameClock = (game) => {
   if (elapsedSeconds <= 0) return;
 
   const activeColor = getActiveColor(game);
+if (activeColor === "white") {
+  game.whiteTime = Math.max(0, game.whiteTime - elapsedSeconds);
 
-  if (activeColor === "white") {
-    game.whiteTime = Math.max(0, game.whiteTime - elapsedSeconds);
-  } else {
-    game.blackTime = Math.max(0, game.blackTime - elapsedSeconds);
+  if (game.whiteTime <= 0) {
+    game.status = "timeout";
+    game.winner = "black";
+    game.loser = "white";
   }
+} else {
+  game.blackTime = Math.max(0, game.blackTime - elapsedSeconds);
+
+  if (game.blackTime <= 0) {
+    game.status = "timeout";
+    game.winner = "white";
+    game.loser = "black";
+  }
+}
 
   game.lastTickAt += elapsedSeconds * 1000;
 };
@@ -85,6 +96,13 @@ games.push({
 		games.forEach(game => {
 			if (game.id === id) {
 				syncGameClock(game);
+				if (game.status === "timeout") {
+  io.to(id).emit("timeout", {
+    winner: game.winner,
+    loser: game.loser,
+    game: game
+  });
+}
 				if (![...socket.rooms].indexOf(id) >= 0)
 					socket.join(id)
 				socket.to(id).emit("fetch", { game: game })
