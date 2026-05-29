@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import WithMoveValidation from "./integrations/WithMoveValidation";
 import { Button, Icon, Input, Dropdown } from 'semantic-ui-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
+
 import socket from './SocketConfig';
 import WinLostPopup from './WinLostPopup';
 import Parser from 'html-react-parser';
@@ -10,6 +11,7 @@ import './css/ChessBoard.css'
 
 function ChessBoard() {
 	const location = useLocation()
+const history = useHistory()	
 	const locState = location.state
 	const [game, setGame] = useState(locState.game)
 	const gameRef = useRef(game)
@@ -264,18 +266,51 @@ return (
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
-				<Button animated='vertical' className='resign' style={{ marginLeft: "20px" }} onClick={handleResignClick}>
-					<Button.Content hidden>Resign</Button.Content>
-					<Button.Content visible>
-						<Icon name='flag' />
-					</Button.Content>
-				</Button><br />
-				<Button animated='vertical' className='resign' style={{ marginLeft: "20px" }} onClick={() => socket.emit("fetch", { id: locState.game.id })}>
-					<Button.Content hidden>Fetch</Button.Content>
-					<Button.Content visible>
-						<Icon name='refresh' />
-					</Button.Content>
-				</Button><br />
+				{!timeoutResult ? (
+  <Button
+    animated='vertical'
+    className='resign'
+    style={{ marginLeft: "20px" }}
+    onClick={handleResignClick}
+  >
+    <Button.Content hidden>Resign</Button.Content>
+
+    <Button.Content visible>
+      <Icon name='flag' />
+    </Button.Content>
+  </Button>
+) : (
+  <>
+    <Button
+      color="green"
+      style={{ marginLeft: "20px" }}
+      onClick={() => window.location.reload()}
+    >
+      Rematch
+    </Button>
+
+    <Button
+      color="yellow"
+      style={{ marginLeft: "10px" }}
+      onClick={() => history.push("/")}
+    >
+      Back
+    </Button>
+  </>
+)}<br />{!timeoutResult && (
+  <Button
+    animated='vertical'
+    className='resign'
+    style={{ marginLeft: "20px" }}
+    onClick={() => socket.emit("fetch", { id: locState.game.id })}
+  >
+    <Button.Content hidden>Fetch</Button.Content>
+
+    <Button.Content visible>
+      <Icon name='refresh' />
+    </Button.Content>
+  </Button>
+)}<br />
 				{/* <span>{game.pgn}</span> */}
 				<div className="moves-div">
 					<br />
