@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom';
 import "./css/NewGamePopup.css";
 import socket from './SocketConfig';
 import { Form, Checkbox } from 'semantic-ui-react'
+import aiSocket from './AiSocketConfig';
 
 function NewGamePopup() {
 	const [open, setOpen] = useState(undefined)
@@ -33,14 +34,14 @@ function NewGamePopup() {
 	const handleSubmitComputer = (e) => {
 		e.preventDefault()
 
-		socket.emit("createComputerGame", {
+		aiSocket.emit("createComputerGame", {
   username: username,
   ai: ai,
   timer: Number(timer)
 })
 		
 		setLoading(true)
-		socket.on("createdComputerGame", ({ game }) => {
+		aiSocket.on("createdComputerGame", ({ game }) => {
 			setGame(game)
 			setRedirect(true)
 			setLoading(false)
