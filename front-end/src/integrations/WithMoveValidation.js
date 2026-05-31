@@ -142,8 +142,10 @@ class HumanVsHuman extends Component {
   };
 
   onDrop = ({ sourceSquare, targetSquare }) => {
-    if (this.state.game.turn() === 'w' && this.state.orientation !== "white") return
-    if (this.state.game.turn() === 'b' && this.state.orientation !== "black") return
+   const currentOrientation = this.props.orientation || this.state.orientation || "white";
+
+if (this.state.game.turn() === 'w' && currentOrientation !== "white") return;
+if (this.state.game.turn() === 'b' && currentOrientation !== "black") return;
 
     let move = this.state.game.move({
       from: sourceSquare,
@@ -223,8 +225,10 @@ this.justPlayedSound = true;
   };
 
   onSquareClick = square => {
-    if (this.state.game.turn() === 'w' && this.state.orientation !== "white") return
-    if (this.state.game.turn() === 'b' && this.state.orientation !== "black") return
+    const currentOrientation = this.props.orientation || this.state.orientation || "white";
+
+if (this.state.game.turn() === 'w' && currentOrientation !== "white") return;
+if (this.state.game.turn() === 'b' && currentOrientation !== "black") return;
 
     this.setState(({ history }) => ({
       squareStyles: squareStyling({ pieceSquare: square, history: this.state.game.history({ verbose: true }) }),
