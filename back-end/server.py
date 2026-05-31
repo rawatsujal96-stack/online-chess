@@ -11,6 +11,8 @@ from engine import Engine
 import time
 from multiprocessing.pool import ThreadPool
 from threading import Thread
+from engine import Engine
+engine = Engine()
 
 sio = socketio.AsyncServer(cors_allowed_origins='*')
 app = web.Application()
@@ -26,7 +28,7 @@ games = []
 rooms = []
 tot_client = 0
 
-engine = None
+
 
 pool = ThreadPool(processes=10)
 
@@ -170,11 +172,34 @@ async def move(sid, data):
                     game['blackTime'] = max(game.get('blackTime', 0) - elapsed, 0)
                     game['turn'] = 'white'
 
-                game['lastTick'] = now
+            game['lastTick'] = now
 
             game['pgn'] = data['pgn']
+            board = chess.Board()
+            moves = data['pgn'].split()
 
-        
+            for move in moves:
+                if "." not in move:
+                    try:
+                        board.push_san(move)
+                    except:
+                        pass
+
+            if game['type'] == 'computer':
+
+                if game['ai'] == 'stockfish':
+                    ai_move = engine.get_stockfish_best_move(board)
+                else:
+                    ai_move = engine.get_random_move(board)
+
+                if ai_move:
+                    board.push(chess.Move.from_uci(ai_move))
+
+                    game['pgn'] = str(
+                        board.variation_san(
+                            [chess.Move.from_uci(ai_move)]
+                        )
+                    )
 
             await sio.emit(
                     'moved',
