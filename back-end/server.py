@@ -195,11 +195,7 @@ async def move(sid, data):
                 if ai_move:
                     board.push(chess.Move.from_uci(ai_move))
 
-                    game['pgn'] = str(
-                        board.variation_san(
-                            [chess.Move.from_uci(ai_move)]
-                        )
-                    )
+                    game['pgn'] += " " + board.san(chess.Move.from_uci(ai_move))
 
             await sio.emit(
                     'moved',
